@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model dechet {
+  id        Int           @id @default(autoincrement())
+  type      dechet_type
+  quantite  Float
+  adresse   String
+  ville     String
+  userId    Int
+  statut    dechet_statut @default(EN_ATTENTE)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime
+  latitude  Float?
+  longitude Float?
+  photo     String? // URL Cloudinary de la photo
+  user      user          @relation(fields: [userId], references: [id], map: "Dechet_userId_fkey")
+
+  @@index([userId], map: "Dechet_userId_fkey")
+}
+
+model session {
+  id           Int      @id @default(autoincrement())
+  token        String   @unique(map: "Session_token_key")
+  refreshToken String   @unique(map: "Session_refreshToken_key")
+  expiresAt    DateTime
+  userId       Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime
+  user         user     @relation(fields: [userId], references: [id], map: "Session_userId_fkey")
+
+  @@index([userId], map: "Session_userId_fkey")
+}
+
+model signalement {
+  id          Int      @id @default(autoincrement())
+  type        String
+  latitude    Float
+  longitude   Float
+  status      String   @default("en_attente")
+  createdAt   DateTime @default(now())
+  userId      Int
+  description String?  // Description du signalement
+  photo       String?  // URL de la photo (optionnel)
+  user        user     @relation(fields: [userId], references: [id], map: "Signalement_userId_fkey")
+
+  @@index([userId], map: "Signalement_userId_fkey")
+}
+
+model user {
+  id          Int           @id @default(autoincrement())
+  nom         String
+  email       String        @unique(map: "User_email_key")
+  password    String
+  telephone   String
+  adresse     String
+  role        user_role     @default(USER)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime
+  photoUrl    String        @default("https://www.gravatar.com/avatar/?d=identicon")
+  dechet      dechet[]
+  session     session[]
+  signalement signalement[]
+}
+
+enum dechet_type {
+  ORGANIQUE
+  PLASTIQUE
+  PAPIER
+  METAL
+  VERRE
+  DANGEREUX
+}
+
+enum dechet_statut {
+  EN_ATTENTE
+  COLLECTE
+  TRAITE
+}
+
+enum user_role {
+  USER
+  COLLECTOR
+  ADMIN
+}
