@@ -28,15 +28,15 @@ cd trash-mboa-api
 pnpm install
 ```
 
-3. Configurer les variables d'environnement
+3. Créer une variable d'environnement
 ```bash
-touch .env
+.env
 ```
 Remplir les variables dans le fichier `.env` :
 ```
-DATABASE_URL="postgresql://user:password@localhost:5432/trash_mboa"
+DATABASE_URL="mysql://root:@localhost:3306/trash_mboa"
 JWT_SECRET="votre-secret-jwt"
-PORT=3000
+PORT=3002
 ```
 
 4. Générer le client Prisma
